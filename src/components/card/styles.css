@@ -1,0 +1,27 @@
+.card {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 10px;
+}
+
+.owner {
+    padding: 20px;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: -webkit-fill-available;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.spaceEvenly {
+    justify-content: space-evenly;
+}

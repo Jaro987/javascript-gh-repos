@@ -1,5 +1,6 @@
 import { RepoType } from "../../Types";
 import { Card } from "../card";
+import './styles.css'
 
 type ListType = {
     repos: RepoType[];
@@ -16,13 +17,14 @@ const List = ({ repos, isLoading }: ListType) => {
     }
 
     const RenderReposList = () => {
-        return (<div style={{ display: 'flex', flexDirection: 'column' }}>
-            {repos.map((repo) => {
-                return (
-                    <Card repo={repo} />
-                )
-            })}
-        </div>
+        return (
+            <div className='grid'>
+                {repos.map((repo) => {
+                    return (
+                        <Card repo={repo} />
+                    )
+                })}
+            </div>
         )
     }
     return (

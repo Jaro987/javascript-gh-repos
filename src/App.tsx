@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Tabs } from "./components/tabs";
+import './App.css';
 
 export default function App() {
   useEffect(()=> {
