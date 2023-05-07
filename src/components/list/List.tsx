@@ -19,9 +19,9 @@ const List = ({ repos, isLoading }: ListType) => {
     const RenderReposList = () => {
         return (
             <div className='grid'>
-                {repos.map((repo) => {
+                {repos.map((repo, index) => {
                     return (
-                        <Card repo={repo} />
+                        <Card key={index} repo={repo} />
                     )
                 })}
             </div>

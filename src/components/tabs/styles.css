@@ -1,0 +1,16 @@
+.controls {
+    max-width: 300px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.tablist {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.tab {
+    width: -webkit-fill-available;
+}
