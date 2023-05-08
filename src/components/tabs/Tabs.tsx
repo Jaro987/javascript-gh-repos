@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { RepoType, TabsType } from "../../Types";
 import { List } from "../list";
 import './styles.css';
@@ -64,7 +64,7 @@ const Tabs = ({ tabsConfig, defaultIndex }: TabsType) => {
     }
 
     return (
-        <>
+        <div className='wrapper'>
             <div role="tablist" aria-orientation="horizontal" className='tablist'>
                 {tabsConfig.map((tab, index) => (
                     <button
@@ -95,7 +95,7 @@ const Tabs = ({ tabsConfig, defaultIndex }: TabsType) => {
                     </section>
                 ))}
             </div >
-        </>
+        </div>
     );
 };
 

@@ -1,5 +1,7 @@
 import { RepoType } from "../../Types";
 import { Fork, Star } from "../../icons";
+import { useNavigate } from "react-router-dom";
+import { AvatarComponent } from "../avatarComponent";
 import './styles.css'
 
 type CardType = {
@@ -7,12 +9,12 @@ type CardType = {
 }
 
 const Card = ({ repo }: CardType) => {
+    const navigate = useNavigate();
+    const owner = repo.owner.login;
+    const name = repo.name;
     return (
-        <div key={repo.id} className='card'>
-            <div className='owner'>
-                <img src={repo.owner.avatar_url} alt={repo.owner.login} height={'50px'} width={'50px'} />
-                <div>{repo.owner.login}</div>
-            </div>
+        <div key={repo.id} className='card' onClick={()=>navigate(`${owner}/${name}`)}>
+            <AvatarComponent user={repo.owner} size={75} shape='circle' />
             <div className='info'>
                 <h3>{repo.name}</h3>
                 <div className={`row spaceEvenly`}>
@@ -21,8 +23,8 @@ const Card = ({ repo }: CardType) => {
                         {repo.forks_count}</div>
                     <div className='row'>
                         <Star />
-                        {repo.stargazers_count}</div>
-
+                        {repo.stargazers_count}
+                    </div>
                 </div>
             </div>
         </div>
