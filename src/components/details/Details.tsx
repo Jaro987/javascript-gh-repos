@@ -68,23 +68,21 @@ const Details = () => {
     }
     const RenderRepoDetails = ({ repo }: RenderRepoDetailsType) => {
         return (
-            <div style={{ maxWidth: '600px', margin: 'auto' }}>
-                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
+            <div className="repo-details-wrapper">
+                <div className="avatar-and-title">
                     <AvatarComponent user={repo.owner} size={100}/>
-                    <div className='info'>
                         <h1>{repo.name}</h1>
-                    </div>
                 </div>
                 <hr />
-                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-evenly' }}>
-                    <div style={{ display: 'flex', flexDirection: 'row', columnGap: '10px', alignItems: 'center' }}>
+                <div className="significant-numbers-wrapper">
+                    <div className="significant-number">
                         <Fork />
                         {repo.forks_count}</div>
-                    <div style={{ display: 'flex', flexDirection: 'row', columnGap: '10px', alignItems: 'center' }}>
+                    <div className="significant-number">
                         <Star />
                         {repo.stargazers_count}
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'row', columnGap: '10px', alignItems: 'center' }}>
+                    <div className="significant-number">
                         <OpenIssues />
                         {repo.open_issues_count}
                     </div>
