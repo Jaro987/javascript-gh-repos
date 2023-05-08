@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import { RepoType, TabsType } from "../../Types";
+import { useCallback, useEffect, useState } from "react";
+import { PaginationObjType, RepoType, TabsType } from "../../Types";
 import { List } from "../list";
 import './styles.css';
-
+import { useParams } from "react-router-dom";
+import { Pagination } from "../paginaton";
 
 const Tabs = ({ tabsConfig, defaultIndex }: TabsType) => {
     const [selectedIndex, setSelectedIndex] = useState(defaultIndex ?? 0);
@@ -13,24 +14,40 @@ const Tabs = ({ tabsConfig, defaultIndex }: TabsType) => {
 
 
     const [repos, setRepos] = useState<RepoType[]>([]);
+    const [pagination, setPagination] = useState<PaginationObjType>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [sortBy, setSortBy] = useState<string>('stars');
     const [order, setOrder] = useState<string>('desc');
+    const [page, setPage] = useState<number>(1)
+
+    const createPaginationObj = useCallback((total_count: number, page: number) => {
+        const lastPage = Math.ceil(total_count / 30);
+        const currentPage = page;
+        return { currentPage, lastPage };
+    }, []);
 
 
-    useEffect(() => {
-        fetchData(tabsConfig[selectedIndex].label.toLowerCase(), sortBy, order)
-    }, [order, selectedIndex, sortBy, tabsConfig])
-
-    async function fetchData(topic: string, sortBy: string, order: string) {
+    
+    const fetchData = useCallback(async(topic: string, sortBy: string, order: string, forPage?: number) => {
         setIsLoading(true)
-        const url = `https://api.github.com/search/repositories?q=${topic}&sort=${sortBy}&order=${order}`;
+        let url = `https://api.github.com/search/repositories?q=${topic}&sort=${sortBy}&order=${order}`;
+        if (forPage) {
+            url += `&page=${forPage}`;
+        }
         const response = await fetch(url);
         const data = await response.json();
         setRepos(data.items);
+        setPagination(createPaginationObj(data.total_count, forPage ? forPage : page))
         setIsLoading(false)
-    }
+    }, [createPaginationObj, page])
+    
+    useEffect(() => {
+        fetchData(tabsConfig[selectedIndex].label.toLowerCase(), sortBy, order)
+    }, [fetchData, order, selectedIndex, sortBy, tabsConfig]);
 
+    const getDataOnSpecificPage = (page: number) => {
+        fetchData(tabsConfig[selectedIndex].label.toLowerCase(), sortBy, order, page)
+    }
 
     const SortBy = () => {
         return (
@@ -92,6 +109,7 @@ const Tabs = ({ tabsConfig, defaultIndex }: TabsType) => {
                         id={`panel-id-${index}`}>
                         <Controls />
                         <List repos={repos} isLoading={isLoading} />
+                        {pagination && <Pagination pagination={pagination} callback={(page)=>getDataOnSpecificPage(page)} />}
                     </section>
                 ))}
             </div >

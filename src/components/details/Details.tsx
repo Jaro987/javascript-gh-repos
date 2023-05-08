@@ -97,13 +97,11 @@ const Details = () => {
                 <hr />
                 <div>
                     <h2>Languages</h2>
-                    {/*language loader */}
                     <ul>{languages && Object.keys(languages).map((language) => <li key={language}>{language} </li>)}</ul>
                 </div>
                 <hr />
                 <div>
                     <h2>Contributors</h2>
-                    {/*add grid to show image and name */}
                     <div className='contributors-grid'>
                         {contributors && contributors.map((contributor) => {
                             return (
@@ -112,8 +110,6 @@ const Details = () => {
                         })}
                     </div>
                 </div>
-
-
             </div>
         )
     }

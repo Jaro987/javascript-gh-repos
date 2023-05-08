@@ -119,3 +119,14 @@ export type RepoType = {
     default_branch: string;
     score: number;
 }
+
+export type PaginationObjType = {
+    currentPage: number;
+    lastPage: number;
+};
+
+export type PaginationIconProps = {
+    onClick: () => void;
+    fill: string;
+    cursor: string;
+}
