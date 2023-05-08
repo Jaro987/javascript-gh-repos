@@ -1,52 +1,36 @@
 import { useCallback, useEffect, useState } from "react";
-import { PaginationObjType, RepoType, TabsType } from "../../Types";
+import { RepoType, TabsType } from "../../Types";
 import { List } from "../list";
-import './styles.css';
-import { useParams } from "react-router-dom";
 import { Pagination } from "../paginaton";
+import { useRepos } from "../../hooks";
+import './styles.css';
 
 const Tabs = ({ tabsConfig, defaultIndex }: TabsType) => {
+
+    const { getRepos, isLoading, pagination } = useRepos();
+
     const [selectedIndex, setSelectedIndex] = useState(defaultIndex ?? 0);
-    const handleClick = (index: number, topic: string) => {
+    const handleClick = (index: number) => {
         setSelectedIndex(index)
-        fetchData(topic.toLowerCase(), sortBy, order)
+        fetchData();
     };
 
-
     const [repos, setRepos] = useState<RepoType[]>([]);
-    const [pagination, setPagination] = useState<PaginationObjType>();
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [sortBy, setSortBy] = useState<string>('stars');
     const [order, setOrder] = useState<string>('desc');
-    const [page, setPage] = useState<number>(1)
 
-    const createPaginationObj = useCallback((total_count: number, page: number) => {
-        const lastPage = Math.ceil(total_count / 30);
-        const currentPage = page;
-        return { currentPage, lastPage };
-    }, []);
+    const fetchData = useCallback( async(page?: number) => {
+        const repos = await getRepos(tabsConfig[selectedIndex].label.toLowerCase(), sortBy, order, page);
+        setRepos(repos);
+    }, [selectedIndex, sortBy, order]);
 
+    useEffect( () => {
+        fetchData();
+      }, [fetchData]);
 
-    
-    const fetchData = useCallback(async(topic: string, sortBy: string, order: string, forPage?: number) => {
-        setIsLoading(true)
-        let url = `https://api.github.com/search/repositories?q=${topic}&sort=${sortBy}&order=${order}`;
-        if (forPage) {
-            url += `&page=${forPage}`;
-        }
-        const response = await fetch(url);
-        const data = await response.json();
-        setRepos(data.items);
-        setPagination(createPaginationObj(data.total_count, forPage ? forPage : page))
-        setIsLoading(false)
-    }, [createPaginationObj, page])
-    
-    useEffect(() => {
-        fetchData(tabsConfig[selectedIndex].label.toLowerCase(), sortBy, order)
-    }, [fetchData, order, selectedIndex, sortBy, tabsConfig]);
 
     const getDataOnSpecificPage = (page: number) => {
-        fetchData(tabsConfig[selectedIndex].label.toLowerCase(), sortBy, order, page)
+        fetchData(page);
     }
 
     const SortBy = () => {
@@ -78,7 +62,7 @@ const Tabs = ({ tabsConfig, defaultIndex }: TabsType) => {
                 <OrderBy />
             </div>
         )
-    }
+    };
 
     return (
         <div className='wrapper'>
@@ -89,7 +73,7 @@ const Tabs = ({ tabsConfig, defaultIndex }: TabsType) => {
                         key={`tab-${index}`}
                         onFocus={() => setSelectedIndex(index)}
                         tabIndex={selectedIndex === index ? 0 : -1}
-                        onClick={() => handleClick(index, tab.label)}
+                        onClick={() => handleClick(index)}
                         role="tab"
                         aria-controls={`panel-id-${index}`}
                         aria-selected={selectedIndex === index}
@@ -109,7 +93,11 @@ const Tabs = ({ tabsConfig, defaultIndex }: TabsType) => {
                         id={`panel-id-${index}`}>
                         <Controls />
                         <List repos={repos} isLoading={isLoading} />
-                        {pagination && <Pagination pagination={pagination} callback={(page)=>getDataOnSpecificPage(page)} />}
+                        {pagination &&
+                            <Pagination
+                                pagination={pagination}
+                                callback={(page) => getDataOnSpecificPage(page)}
+                            />}
                     </section>
                 ))}
             </div >

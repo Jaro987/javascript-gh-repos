@@ -3,6 +3,8 @@ import { OwnerType, RepoType } from "../../Types";
 import { useParams } from "react-router-dom";
 import { Fork, Star, OpenIssues } from "../../icons";
 import { AvatarComponent } from "../avatarComponent";
+import { Loader } from "../loader";
+import { useRepos } from "../../hooks";
 
 import './styles.css';
 
@@ -18,49 +20,35 @@ const Details = () => {
     const [repo, setRepo] = useState<RepoType>();
     const [languages, setLanguages] = useState<Record<string, number>>({});
     const [contributors, setContributors] = useState<OwnerType[]>();
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isLoadingLang, setIsLoadingLang] = useState<boolean>(false);
     const [isLoadingContributors, setIsLoadingContributors] = useState<boolean>(false);
+    const { getOwnersRepo, isLoading } = useRepos();
 
     const { owner, name } = useParams();
     useEffect(() => {
         owner && name && fetchData(owner, name)
     }, [owner, name])
 
-    async function fetchData(owner: string, name: string) {
-        setIsLoading(true)
-        const url = `https://api.github.com/repos/${owner}/${name}`;
-        const response = await fetch(url);
-        const data = await response.json();
+    const fetchData = async (owner: string, name: string) => {
+        const data = await getOwnersRepo(owner, name);
         setRepo(data);
-        setIsLoading(false)
-    }
-
-    async function getLanguages(languagesUrl: string) {
-        setIsLoadingLang(true)
-        const response = await fetch(languagesUrl);
-        const data = await response.json();
-        setLanguages(data)
-        setIsLoadingLang(false)
-        return data;
     }
 
     useEffect(() => {
-        repo && getLanguages(repo.languages_url);
-    }, [repo, repo?.id])
+        (async () => {
+            setIsLoadingLang(true);
+            const langResponse = repo && await fetch(repo.languages_url);
+            const languages = langResponse && await langResponse.json();
+            setLanguages(languages);
+            setIsLoadingLang(false);
 
-    async function getContributors(contributorsUrl: string) {
-        setIsLoadingLang(true)
-        const response = await fetch(contributorsUrl);
-        const data = await response.json();
-        const upToTenContributors = data.length > 10 ? data.slice(0, 10) : data;
-        setContributors(upToTenContributors);
-        setIsLoadingContributors(false)
-        return data;
-    }
-
-    useEffect(() => {
-        repo && getContributors(repo.contributors_url);
+            setIsLoadingContributors(true);
+            const contributorsResponse = repo && await fetch(repo.contributors_url);
+            const contributors = contributorsResponse && await contributorsResponse.json();
+            const upToTenContributors = contributors.length > 10 ? contributors.slice(0, 10) : contributors;
+            setContributors(upToTenContributors);
+            setIsLoadingContributors(false);
+        })();
     }, [repo, repo?.id])
 
     const RenderText = ({ text }: RenderTextType) => {
@@ -70,8 +58,8 @@ const Details = () => {
         return (
             <div className="repo-details-wrapper">
                 <div className="avatar-and-title">
-                    <AvatarComponent user={repo.owner} size={100}/>
-                        <h1>{repo.name}</h1>
+                    <AvatarComponent user={repo.owner} size={100} />
+                    <h1>{repo.name}</h1>
                 </div>
                 <hr />
                 <div className="significant-numbers-wrapper">
@@ -95,15 +83,16 @@ const Details = () => {
                 <hr />
                 <div>
                     <h2>Languages</h2>
-                    <ul>{languages && Object.keys(languages).map((language) => <li key={language}>{language} </li>)}</ul>
+                    {isLoadingLang ? <Loader /> :
+                        <ul>{languages && Object.keys(languages).map((language) => <li key={language}>{language} </li>)}</ul>}
                 </div>
                 <hr />
                 <div>
                     <h2>Contributors</h2>
                     <div className='contributors-grid'>
-                        {contributors && contributors.map((contributor) => {
+                        {isLoadingContributors ? <Loader /> : contributors?.map((contributor) => {
                             return (
-                                <AvatarComponent key={contributor.id} user={contributor} shape="circle"/>
+                                <AvatarComponent key={contributor.id} user={contributor} shape="circle" />
                             )
                         })}
                     </div>
@@ -113,7 +102,7 @@ const Details = () => {
     }
 
     return (
-        isLoading ? <RenderText text='loading' /> : repo ? <RenderRepoDetails repo={repo} /> : <RenderText text='error' />
+        isLoading ? <Loader /> : repo ? <RenderRepoDetails repo={repo} /> : <RenderText text='error' />
     );
 }
 

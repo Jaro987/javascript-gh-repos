@@ -1,5 +1,7 @@
+import ErrorPage from "../../ErrorPage";
 import { RepoType } from "../../Types";
 import { Card } from "../card";
+import { Loader } from "../loader";
 import './styles.css'
 
 type ListType = {
@@ -8,7 +10,6 @@ type ListType = {
 }
 
 const List = ({ repos, isLoading }: ListType) => {
-
     type RenderTextType = {
         text: string
     }
@@ -18,7 +19,7 @@ const List = ({ repos, isLoading }: ListType) => {
 
     const RenderReposList = () => {
         return (
-            <div className='grid'>
+            <div className='grid' >
                 {repos.map((repo, index) => {
                     return (
                         <Card key={index} repo={repo} />
@@ -28,7 +29,10 @@ const List = ({ repos, isLoading }: ListType) => {
         )
     }
     return (
-        isLoading ? <RenderText text='loading' /> : repos ? <RenderReposList /> : <RenderText text='error' />
+        <div 
+        className={'List-wrapper'}>
+        {isLoading ? <Loader /> : repos ? <RenderReposList /> : <ErrorPage />}
+        </div>
     );
 };
 export default List;

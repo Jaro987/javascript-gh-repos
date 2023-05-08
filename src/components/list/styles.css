@@ -4,4 +4,9 @@
     grid-auto-rows: auto;
     grid-gap: 1rem;
     padding: 10px;
+    overflow: auto;
+}
+
+.List-wrapper {
+    height: var(--height);
 }

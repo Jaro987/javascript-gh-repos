@@ -1,14 +1,14 @@
-import { ReactElement } from "react";
+import { LegacyRef, ReactElement, forwardRef } from "react";
 import { PaginationObjType } from "../../Types";
-import './styles.css'
 import { ChevronLeft, ChevronRight, PushLeft, PushRight } from "../../icons";
+import './styles.css'
 
 type PaginationType = {
     callback: (page: number) => void;
     pagination: PaginationObjType;
 }
 
-const Pagination = ({ callback, pagination }: PaginationType): ReactElement => {
+const Pagination = forwardRef(({ callback, pagination }: PaginationType, ref: LegacyRef<HTMLDivElement>): ReactElement => {
     const numbersToRender = (): Array<string> => {
         const NUMBER_OF_VISIBLE_PAGES = 5;
         const halfOfVisiblePagesInt = parseInt(`${NUMBER_OF_VISIBLE_PAGES / 2}`);
@@ -43,7 +43,7 @@ const Pagination = ({ callback, pagination }: PaginationType): ReactElement => {
     const cursorArrows = (isDisabled: boolean) => (isDisabled ? 'not-allowed' : 'pointer');
 
     return (
-        <div className='pagiantion-container'>
+        <div className='pagiantion-container' ref={ref}>
             <PushLeft
                 onClick={() => (disabledLeftArrows ? undefined : callback(1))}
                 fill={fillArrows(disabledLeftArrows)}
@@ -79,6 +79,6 @@ const Pagination = ({ callback, pagination }: PaginationType): ReactElement => {
             />
         </div>
     )
-}
+})
 
 export default Pagination;

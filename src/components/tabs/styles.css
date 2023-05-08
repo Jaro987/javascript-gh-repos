@@ -18,3 +18,7 @@
 .tab {
     width: -webkit-fill-available;
 }
+
+.tabpanel-wrapper {
+    height: var(--height);
+}
